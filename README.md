@@ -4,11 +4,15 @@
 
 See projekt sisaldab Node.js-põhist seemneskripti, mis genereerib ja sisestab suures mahus testandmeid MySQL andmebaasi, mis modelleerib Airbnb-laadset platvormi.
 
+---
+
 ## Eeltingimused
 
 - Node.js (v14+ soovitatav)
 - MySQL server (InnoDB tabelitega)
 - Andmebaasi kasutaja ja parool, kellel on vajalikud õigused andmete loomisel ja kustutamisel
+
+---
 
 ## Andmebaasi skeem
 
@@ -107,4 +111,3 @@ CREATE TABLE bookings (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
-
