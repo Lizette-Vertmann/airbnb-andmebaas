@@ -1,4 +1,4 @@
-# Airbnb andmebaasi seemneskript
+# Airbnb andmebaas
 
 ## Ülevaade
 
