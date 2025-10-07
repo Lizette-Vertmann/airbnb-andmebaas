@@ -6,7 +6,6 @@ const SEED = 12345;
 faker.seed(SEED);
 
 async function main() {
-  // Muuda need enda andmebaasi andmetega vastavaks:
   const connection = await mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -17,7 +16,6 @@ async function main() {
 
   console.log('Ühendatud andmebaasi');
 
-  // Keera indeksid ja FK-d mass-sisestuse ajaks välja (parandab kiirust)
   await connection.query(`
     ALTER TABLE bookings DISABLE KEYS;
     ALTER TABLE reviews DISABLE KEYS;
@@ -26,7 +24,6 @@ async function main() {
     ALTER TABLE listing_amenities DISABLE KEYS;
   `).catch(() => {});
 
-  // Puhasta tabelid
   console.log('Tühjendan tabelid...');
   await connection.query(`
     SET FOREIGN_KEY_CHECKS = 0;
@@ -43,7 +40,6 @@ async function main() {
     SET FOREIGN_KEY_CHECKS = 1;
   `);
 
-  // Täida lookup tabelid väiksemate andmetega
   console.log('Täidan lookup tabelid...');
   const roomTypes = ['Entire home/apt', 'Private room', 'Shared room', 'Hotel room'];
   for (const name of roomTypes) {
@@ -55,7 +51,6 @@ async function main() {
     await connection.query('INSERT INTO countries (name) VALUES (?)', [name]);
   }
 
-  // Loe lookup id-d hilisemaks kasutamiseks
   const [roomTypeRows] = await connection.query('SELECT id FROM room_types');
   const roomTypeIds = roomTypeRows.map(r => r.id);
 
@@ -63,7 +58,6 @@ async function main() {
   const countryMap = {};
   for (const c of countryRows) countryMap[c.name] = c.id;
 
-  // Lisa linnad (igasse riiki ~10 linna)
   console.log('Täidan linnad...');
   const cityNames = {
     Estonia: ['Tallinn', 'Tartu', 'Narva', 'Pärnu', 'Viljandi', 'Rakvere', 'Kuressaare', 'Haapsalu', 'Jõhvi', 'Valga'],
@@ -78,22 +72,18 @@ async function main() {
     }
   }
 
-  // Loe linnad id-d
   const [cityRows] = await connection.query('SELECT id FROM cities');
   const cityIds = cityRows.map(c => c.id);
 
-  // Lisa amenities (väike nimekiri)
   console.log('Täidan amenities...');
   const amenitiesList = ['WiFi', 'Air conditioning', 'Kitchen', 'Heating', 'Washer', 'Dryer', 'Free parking', 'Pool', 'TV', 'Gym'];
   for (const name of amenitiesList) {
     await connection.query('INSERT INTO amenities (name) VALUES (?)', [name]);
   }
 
-  // Loe amenities id-d
   const [amenitiesRows] = await connection.query('SELECT id FROM amenities');
   const amenityIds = amenitiesRows.map(a => a.id);
 
-  // Lisa users - siht 100 000 kasutajat
   const USERS_COUNT = 100000;
   console.log(`Täidan users tabelit ${USERS_COUNT} kasutajaga...`);
   for (let i = 0; i < USERS_COUNT; i += BATCH_SIZE) {
@@ -101,7 +91,7 @@ async function main() {
     for (let j = 0; j < BATCH_SIZE && i + j < USERS_COUNT; j++) {
       const name = faker.name.findName();
       const email = faker.internet.email(name).toLowerCase();
-      const password = faker.internet.password(10); // Siin võiks olla hash reaalselt
+      const password = faker.internet.password(10); 
       batch.push([name, email, password]);
     }
     const placeholders = batch.map(() => '(?,?,?)').join(',');
@@ -111,11 +101,9 @@ async function main() {
   }
   console.log('\nKasutajad sisestatud.');
 
-  // Loe kasutajate id-d
   const [userRows] = await connection.query('SELECT id FROM users');
   const userIds = userRows.map(u => u.id);
 
-  // Lisa hosts - valin 50% kasutajatest hostideks
   const HOSTS_COUNT = Math.floor(USERS_COUNT * 0.5);
   console.log(`Täidan hosts tabelit ${HOSTS_COUNT} hostiga...`);
   for (let i = 0; i < HOSTS_COUNT; i += BATCH_SIZE) {
@@ -138,11 +126,9 @@ async function main() {
   }
   console.log('\nHostid sisestatud.');
 
-  // Loe host id-d
   const [hostRows] = await connection.query('SELECT id FROM hosts');
   const hostIds = hostRows.map(h => h.id);
 
-  // Lisa listings - siht 200 000 listings (mõistlikus proportsioonis, võib lisada ka rohkem)
   const LISTINGS_COUNT = 200000;
   console.log(`Täidan listings tabelit ${LISTINGS_COUNT} listinguga...`);
   for (let i = 0; i < LISTINGS_COUNT; i += BATCH_SIZE) {
@@ -165,15 +151,13 @@ async function main() {
   }
   console.log('\nListings sisestatud.');
 
-  // Loe listing id-d
   const [listingRows] = await connection.query('SELECT id FROM listings');
   const listingIds = listingRows.map(l => l.id);
 
-  // Lisa amenities seosed listing_amenities tabelisse
   console.log('Täidan listing_amenities seoseid...');
   for (let i = 0; i < listingIds.length; i += BATCH_SIZE) {
     const batch = [];
-    // iga listing saab 2-5 amenities
+   
     for (let j = 0; j < BATCH_SIZE && i + j < listingIds.length; j++) {
       const listingId = listingIds[i + j];
       const amenityCount = faker.datatype.number({ min: 2, max: 5 });
@@ -194,7 +178,6 @@ async function main() {
   }
   console.log('\nListing amenities sisestatud.');
 
-  // Lisa reviews - siht 500 000 arvustust (keskmiselt ~2.5 arvustust per listing)
   const REVIEWS_COUNT = 500000;
   console.log(`Täidan reviews tabelit ${REVIEWS_COUNT} arvustusega...`);
   for (let i = 0; i < REVIEWS_COUNT; i += BATCH_SIZE) {
@@ -216,7 +199,6 @@ async function main() {
   }
   console.log('\nArvustused sisestatud.');
 
-  // Täida bookings - SIIN ON PEAMINE TABEL > 2 000 000 rida
   const BOOKINGS_COUNT = 2000000;
   console.log(`Täidan bookings tabelit ${BOOKINGS_COUNT} broneeringuga...`);
 
@@ -251,7 +233,6 @@ async function main() {
   }
   console.log('\nBroneeringud sisestatud.');
 
-  // Lülita indeksid ja FK-d uuesti sisse
   console.log('Taastan indeksid ja võtmed...');
   await connection.query(`
     ALTER TABLE bookings ENABLE KEYS;
