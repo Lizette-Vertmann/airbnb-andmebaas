@@ -26,6 +26,7 @@ Veendu, et failid dump.sql, seed.js ja docker-compose.yml asuvad samas kaustas.
 
 docker-compose.yml näidis:
 
+```
 version: "3.8"
 services:
   db:
@@ -49,8 +50,8 @@ services:
       DB_PASSWORD: root
       DB_NAME: airbnb_db
     command: ["node", "seed.js"]
-
+```
 # Käivitamine nullist:
-'docker compose up --build'
+```docker compose up --build```
 
 See käsu jooksutab MySQL konteineri, loob andmebaasi dump.sql põhjal ja käivitab seejärel seemneskripti, mis genereerib vajalikud andmed.
