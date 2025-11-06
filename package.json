@@ -1,0 +1,16 @@
+{
+  "name": "airbnb-andmebaas",
+  "version": "1.0.0",
+  "description": "Airbnb-laadne andmebaasiprojekt, mis genereerib realistlikke suurandmeid MySQL jaoks.",
+  "type": "module",
+  "main": "seemneskript.js",
+  "scripts": {
+    "seed": "bun run seemneskript.js"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "mysql2": "^3.9.7"
+  },
+  "author": "Lizette Vertmann",
+  "license": "MIT"
+}
