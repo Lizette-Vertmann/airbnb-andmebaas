@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   db:
     image: mysql:8
@@ -20,4 +19,4 @@ services:
       DB_USER: root
       DB_PASSWORD: root
       DB_NAME: airbnb_db
-    command: ["node", "seed.js"]
+    command: ["bun", "run", "seemneskript.js"]
