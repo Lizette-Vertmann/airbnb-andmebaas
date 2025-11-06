@@ -1,14 +1,8 @@
-# Airbnb andmebaasi seemneskript (Bun versioon)
-FROM oven/bun:latest
+FROM node:18
 
 WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
 
-# Paigalda sõltuvused
-COPY package.json ./
-RUN bun install
-
-# Lisa skript ja SQL failid
-COPY seemneskript.js ./
-
-# Käivita seemneskript
-CMD ["bun", "run", "seemneskript.js"]
+CMD ["node", "seeds/seemneskript.js", "--out", "data", "--listings", "1000"]
